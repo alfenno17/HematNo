@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HematNo – Catat Keuangan PKL</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50:  '#f0f9ff',
+              100: '#e0f2fe',
+              200: '#bae6fd',
+              300: '#7dd3fc',
+              400: '#38bdf8',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+              800: '#075985',
+              900: '#0c4a6e',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-50 min-h-screen max-w-md mx-auto pb-24">
+
+  <!-- ═══════════════════════════════════════════════
+       HEADER
+  ═══════════════════════════════════════════════ -->
+  <header class="bg-white sticky top-0 z-40 border-b border-gray-100 card-shadow">
+    <div class="px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <!-- Logo icon -->
+        <div class="w-8 h-8 bg-brand-600 rounded-xl flex items-center justify-center">
+          <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33" />
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold text-gray-900 leading-none">HematNo</h1>
+          <p class="text-xs text-gray-400 leading-none mt-0.5">Catat Keuangan PKL</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <!-- Backup -->
+        <button onclick="exportData()" title="Backup Data"
+          class="flex items-center gap-1.5 text-xs font-medium text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-lg hover:bg-emerald-100 transition-colors">
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+          </svg>
+          Backup
+        </button>
+        <!-- Restore -->
+        <button onclick="triggerImport()" title="Restore Data"
+          class="flex items-center gap-1.5 text-xs font-medium text-violet-600 bg-violet-50 px-3 py-1.5 rounded-lg hover:bg-violet-100 transition-colors">
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+          </svg>
+          Restore
+        </button>
+        <!-- Limit Settings -->
+        <button onclick="openLimitModal()" title="Pengaturan Limit"
+          class="flex items-center gap-1.5 text-xs font-medium text-brand-600 bg-brand-50 px-3 py-1.5 rounded-lg hover:bg-brand-100 transition-colors">
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 0 1 1.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.559.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.894.149c-.424.07-.764.383-.929.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 0 1-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.398.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 0 1-.12-1.45l.527-.737c.25-.35.272-.806.108-1.204-.165-.397-.506-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.764-.383.93-.78.165-.398.143-.854-.108-1.204l-.526-.738a1.125 1.125 0 0 1 .12-1.45l.773-.773a1.125 1.125 0 0 1 1.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894Z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+          </svg>
+          Limit
+        </button>
+      </div>
+
+      <!-- Hidden file input untuk import JSON -->
+      <input type="file" id="importFileInput" accept=".json,application/json"
+        class="hidden" onchange="importData(this.files[0])" />
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════════════════════
+       SUMMARY CARDS
+  ═══════════════════════════════════════════════ -->
+  <section class="px-4 pt-4 pb-2">
+    <div class="grid grid-cols-3 gap-2.5">
+      <!-- Pemasukan -->
+      <div class="bg-white rounded-2xl p-3 card-shadow">
+        <div class="w-7 h-7 bg-emerald-50 rounded-lg flex items-center justify-center mb-2">
+          <svg class="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941"/>
+          </svg>
+        </div>
+        <p class="text-xs text-gray-400 font-medium">Pemasukan</p>
+        <p id="totalIncome" class="text-sm font-bold text-emerald-600 mt-0.5 truncate">Rp 0</p>
+      </div>
+      <!-- Pengeluaran -->
+      <div class="bg-white rounded-2xl p-3 card-shadow">
+        <div class="w-7 h-7 bg-red-50 rounded-lg flex items-center justify-center mb-2">
+          <svg class="w-4 h-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6 9 12.75l4.306-4.306a11.95 11.95 0 0 1 5.814 5.518l2.74 1.22m0 0-5.94 2.281m5.94-2.28-2.28-5.941"/>
+          </svg>
+        </div>
+        <p class="text-xs text-gray-400 font-medium">Pengeluaran</p>
+        <p id="totalExpense" class="text-sm font-bold text-red-500 mt-0.5 truncate">Rp 0</p>
+      </div>
+      <!-- Saldo -->
+      <div class="bg-brand-600 rounded-2xl p-3">
+        <div class="w-7 h-7 bg-brand-500 rounded-lg flex items-center justify-center mb-2">
+          <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a2.25 2.25 0 0 0-2.25-2.25H15a3 3 0 1 1-6 0H5.25A2.25 2.25 0 0 0 3 12m18 0v6a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 18v-6m18 0V9M3 12V9m18 0a2.25 2.25 0 0 0-2.25-2.25H5.25A2.25 2.25 0 0 0 3 9m18 0V6a2.25 2.25 0 0 0-2.25-2.25H5.25A2.25 2.25 0 0 0 3 6v3"/>
+          </svg>
+        </div>
+        <p class="text-xs text-brand-200 font-medium">Saldo</p>
+        <p id="totalBalance" class="text-sm font-bold text-white mt-0.5 truncate">Rp 0</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       TABS
+  ═══════════════════════════════════════════════ -->
+  <section class="px-4 mt-3">
+    <div class="bg-white rounded-2xl card-shadow overflow-hidden">
+      <div class="flex border-b border-gray-100">
+        <button onclick="switchTab('daily')"   id="tab-daily"   class="flex-1 py-3 text-sm font-semibold tab-active">Harian</button>
+        <button onclick="switchTab('weekly')"  id="tab-weekly"  class="flex-1 py-3 text-sm font-semibold tab-inactive">Mingguan</button>
+        <button onclick="switchTab('monthly')" id="tab-monthly" class="flex-1 py-3 text-sm font-semibold tab-inactive">Bulanan</button>
+      </div>
+
+      <!-- TAB: HARIAN -->
+      <div id="view-daily" class="p-4 fade-in">
+        <!-- Limit Harian Progress -->
+        <div id="dailyLimitCard" class="mb-4 hidden">
+          <div class="flex justify-between items-center mb-1.5">
+            <span class="text-xs font-semibold text-gray-600">Limit Harian</span>
+            <span id="dailyLimitStatus" class="text-xs font-semibold px-2 py-0.5 rounded-full"></span>
+          </div>
+          <div class="flex justify-between text-xs text-gray-400 mb-1.5">
+            <span id="dailySpent">Terpakai: Rp 0</span>
+            <span id="dailyLimit">Limit: Rp 0</span>
+          </div>
+          <div class="bg-gray-100 rounded-full h-2.5 overflow-hidden">
+            <div id="dailyProgressBar" class="progress-bar-inner h-full rounded-full bg-brand-500" style="width:0%"></div>
+          </div>
+        </div>
+        <!-- Transaksi Hari Ini -->
+        <p class="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wide">Hari Ini</p>
+        <div id="dailyTransactions" class="space-y-2">
+          <div class="text-center py-6">
+            <svg class="w-10 h-10 text-gray-200 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z"/>
+            </svg>
+            <p class="text-sm text-gray-400">Belum ada transaksi hari ini</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: MINGGUAN -->
+      <div id="view-weekly" class="p-4 hidden fade-in">
+        <!-- Limit Mingguan Progress -->
+        <div id="weeklyLimitCard" class="mb-4 hidden">
+          <div class="flex justify-between items-center mb-1.5">
+            <span class="text-xs font-semibold text-gray-600">Limit Mingguan</span>
+            <span id="weeklyLimitStatus" class="text-xs font-semibold px-2 py-0.5 rounded-full"></span>
+          </div>
+          <div class="flex justify-between text-xs text-gray-400 mb-1.5">
+            <span id="weeklySpent">Terpakai: Rp 0</span>
+            <span id="weeklyLimit">Limit: Rp 0</span>
+          </div>
+          <div class="bg-gray-100 rounded-full h-2.5 overflow-hidden">
+            <div id="weeklyProgressBar" class="progress-bar-inner h-full rounded-full bg-brand-500" style="width:0%"></div>
+          </div>
+        </div>
+        <!-- Stats per hari dalam minggu ini -->
+        <p class="text-xs font-semibold text-gray-500 mb-3 uppercase tracking-wide">Pengeluaran Per Hari (Minggu Ini)</p>
+        <div id="weeklyChart" class="space-y-2.5"></div>
+      </div>
+
+      <!-- TAB: BULANAN -->
+      <div id="view-monthly" class="p-4 hidden fade-in">
+        <!-- Limit Bulanan Progress -->
+        <div id="monthlyLimitCard" class="mb-4 hidden">
+          <div class="flex justify-between items-center mb-1.5">
+            <span class="text-xs font-semibold text-gray-600">Limit Bulanan</span>
+            <span id="monthlyLimitStatus" class="text-xs font-semibold px-2 py-0.5 rounded-full"></span>
+          </div>
+          <div class="flex justify-between text-xs text-gray-400 mb-1.5">
+            <span id="monthlySpent">Terpakai: Rp 0</span>
+            <span id="monthlyLimit">Limit: Rp 0</span>
+          </div>
+          <div class="bg-gray-100 rounded-full h-2.5 overflow-hidden">
+            <div id="monthlyProgressBar" class="progress-bar-inner h-full rounded-full bg-brand-500" style="width:0%"></div>
+          </div>
+        </div>
+        <!-- Alokasi vs Pengeluaran -->
+        <p class="text-xs font-semibold text-gray-500 mb-3 uppercase tracking-wide">Bulan Ini</p>
+        <div class="grid grid-cols-2 gap-2.5 mb-4">
+          <div class="bg-emerald-50 rounded-xl p-3">
+            <p class="text-xs text-emerald-600 font-medium">Total Pemasukan</p>
+            <p id="monthIncome" class="text-base font-bold text-emerald-700 mt-1">Rp 0</p>
+          </div>
+          <div class="bg-red-50 rounded-xl p-3">
+            <p class="text-xs text-red-500 font-medium">Total Pengeluaran</p>
+            <p id="monthExpense" class="text-base font-bold text-red-600 mt-1">Rp 0</p>
+          </div>
+        </div>
+        <div class="bg-brand-50 rounded-xl p-3 mb-4">
+          <p class="text-xs text-brand-600 font-medium">Estimasi Tabungan</p>
+          <p id="monthSaving" class="text-lg font-bold text-brand-700 mt-1">Rp 0</p>
+          <p class="text-xs text-brand-400 mt-0.5">Pemasukan – Pengeluaran bulan ini</p>
+        </div>
+        <!-- Pengeluaran per kategori -->
+        <p class="text-xs font-semibold text-gray-500 mb-2.5 uppercase tracking-wide">Per Kategori</p>
+        <div id="categoryBreakdown" class="space-y-2"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       RIWAYAT SEMUA TRANSAKSI
+  ═══════════════════════════════════════════════ -->
+  <section class="px-4 mt-4">
+    <div class="bg-white rounded-2xl card-shadow overflow-hidden">
+      <div class="px-4 pt-4 pb-2 flex items-center justify-between">
+        <p class="text-sm font-semibold text-gray-700">Semua Transaksi</p>
+        <span id="txCount" class="text-xs text-gray-400 font-medium">0 catatan</span>
+      </div>
+      <div id="allTransactions" class="divide-y divide-gray-50">
+        <div class="text-center py-8">
+          <p class="text-sm text-gray-400">Belum ada transaksi</p>
+          <p class="text-xs text-gray-300 mt-1">Tap tombol + untuk menambah</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       FAB – ADD TRANSACTION
+  ═══════════════════════════════════════════════ -->
+  <button onclick="openTransactionModal()"
+    class="fixed bottom-6 right-4 w-14 h-14 bg-brand-600 text-white rounded-2xl shadow-lg flex items-center justify-center hover:bg-brand-700 active:scale-95 transition-all z-30">
+    <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+    </svg>
+  </button>
+
+  <!-- ═══════════════════════════════════════════════
+       MODAL: TAMBAH TRANSAKSI
+  ═══════════════════════════════════════════════ -->
+  <div id="transactionModal" class="hidden fixed inset-0 z-50 flex items-end justify-center modal-backdrop bg-black/40">
+    <div class="bg-white w-full max-w-md rounded-t-3xl p-5 slide-up">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-base font-bold text-gray-900">Catat Transaksi</h2>
+        <button onclick="closeTransactionModal()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Type Toggle -->
+      <div class="flex bg-gray-100 rounded-xl p-1 mb-4">
+        <button onclick="setType('income')" id="typeIncome"
+          class="flex-1 py-2 rounded-lg text-sm font-semibold transition-all bg-emerald-500 text-white">
+          ↑ Pemasukan
+        </button>
+        <button onclick="setType('expense')" id="typeExpense"
+          class="flex-1 py-2 rounded-lg text-sm font-semibold transition-all text-gray-500">
+          ↓ Pengeluaran
+        </button>
+      </div>
+
+      <!-- Amount -->
+      <div class="mb-3">
+        <label class="block text-xs font-semibold text-gray-500 mb-1.5">Jumlah (Rp)</label>
+        <input type="number" id="txAmount" placeholder="0" min="0"
+          class="w-full border border-gray-200 rounded-xl px-4 py-3 text-lg font-bold text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-transparent placeholder-gray-300" />
+      </div>
+
+      <!-- Category -->
+      <div class="mb-3">
+        <label class="block text-xs font-semibold text-gray-500 mb-1.5">Kategori</label>
+        <div id="categoryButtons" class="grid grid-cols-3 gap-2">
+          <!-- filled by JS -->
+        </div>
+      </div>
+
+      <!-- Note -->
+      <div class="mb-3">
+        <label class="block text-xs font-semibold text-gray-500 mb-1.5">Catatan (opsional)</label>
+        <input type="text" id="txNote" placeholder="Mis: Ojol ke tempat PKL..."
+          class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-transparent placeholder-gray-300" />
+      </div>
+
+      <!-- Date -->
+      <div class="mb-5">
+        <label class="block text-xs font-semibold text-gray-500 mb-1.5">Tanggal</label>
+        <input type="date" id="txDate"
+          class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-transparent" />
+      </div>
+
+      <button onclick="saveTransaction()"
+        class="w-full bg-brand-600 text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-brand-700 active:scale-98 transition-all">
+        Simpan Transaksi
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       MODAL: PENGATURAN LIMIT
+  ═══════════════════════════════════════════════ -->
+  <div id="limitModal" class="hidden fixed inset-0 z-50 flex items-end justify-center modal-backdrop bg-black/40">
+    <div class="bg-white w-full max-w-md rounded-t-3xl p-5 slide-up">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-base font-bold text-gray-900">Pengaturan Limit</h2>
+        <button onclick="closeLimitModal()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <p class="text-xs text-gray-400 mb-4">Kosongkan jika tidak ingin mengatur limit untuk periode tersebut.</p>
+
+      <div class="space-y-4 mb-5">
+        <div>
+          <label class="block text-xs font-semibold text-gray-500 mb-1.5">
+            <span class="inline-flex items-center gap-1.5">
+              <span class="w-2 h-2 bg-brand-400 rounded-full"></span>Limit Harian (Rp)
+            </span>
+          </label>
+          <input type="number" id="limitDaily" placeholder="Mis: 50000" min="0"
+            class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-300 placeholder-gray-300" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-500 mb-1.5">
+            <span class="inline-flex items-center gap-1.5">
+              <span class="w-2 h-2 bg-violet-400 rounded-full"></span>Limit Mingguan (Rp)
+            </span>
+          </label>
+          <input type="number" id="limitWeekly" placeholder="Mis: 300000" min="0"
+            class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-300 placeholder-gray-300" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-500 mb-1.5">
+            <span class="inline-flex items-center gap-1.5">
+              <span class="w-2 h-2 bg-amber-400 rounded-full"></span>Limit Bulanan (Rp)
+            </span>
+          </label>
+          <input type="number" id="limitMonthly" placeholder="Mis: 1200000" min="0"
+            class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-300 placeholder-gray-300" />
+        </div>
+      </div>
+
+      <button onclick="saveLimit()"
+        class="w-full bg-brand-600 text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-brand-700 transition-all">
+        Simpan Limit
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       TOAST
+  ═══════════════════════════════════════════════ -->
+  <div id="toast" class="hidden fixed bottom-24 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-xl text-sm font-medium text-white shadow-lg whitespace-nowrap fade-in"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
